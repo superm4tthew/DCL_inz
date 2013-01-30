@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- List of components -->
+	<Components>
+	<Kbd1 type="Keyboard" thread="Exec2" group="s1">
+            <keys>t</keys> 
+        </Kbd1>
+	
+	 	<matcher type="MatcherFLANN" thread="Exec3" group="s1">
+	 		<directory>/home/mati/pliki/imagedb/surf10/</directory>
+	 		<patchsize>64</patchsize>
+	 		<mode>1</mode>
+	 		<queuesize>10</queuesize>
+	 		<maxload>10</maxload>
+	 		<threshold>0.2</threshold>
+	 		<matching_mode>0</matching_mode>
+			<matching_param>10</matching_param>
+        </matcher>
+        
+        <Seq1 type="Sequencer" thread="Exec3" group="s1">
+			<!--<directory>/home/mati/DisCODe/datasets/opencv_classics_modified/</directory>
+			<directory>/home/mati/imagedb/images/brightnesshigh2/</directory>-->
+			<directory>/home/mati/pliki/imagedb/images/brightnesshigh</directory>
+			<!--<directory>/home/mati/pliki/imagedb/newdb/source/</directory>-->
+			<triggered>1</triggered>		
+		</Seq1>
+		
+		<Fex1 type="ExtractSURF" thread="Exec3" group="s1">
+		<mode>1</mode>
+		<threshold>300</threshold>
+		</Fex1>
+		
+		<Wnd1 type="CvWindow" thread="Exec5" group="s1">
+			<title>Preview</title>
+		</Wnd1>
+
+	</Components>
+
+	<!-- Threads of execution -->
+	<Executors>
+		
+		<Exec2 type="continuous">
+			<main_component>Kbd1</main_component>
+		</Exec2>
+		
+		<Exec3 type="continuous">
+			<main_component>Seq1</main_component>
+		</Exec3>
+		
+		
+		<Exec5 type="continuous">
+			<main_component>Wnd1</main_component>
+			<!-- <interval>0.2</interval>-->
+		</Exec5>
+		
+		
+	</Executors>
+
+	<!-- Event connections -->
+	<Events>
+		<Event source="Kbd1.t_Pressed" destination="Seq1.onTrigger"/>
+		<Event source="Seq1.newImage" destination="Fex1.onNewImage"/>
+		<Event source="Fex1.Computed" destination="matcher.onNewImage"/>
+		<Event source="matcher.matched" destination="Wnd1.onNewImage"/>
+		<!-- wywalic 
+		<Event source="matcher.matched" destination="Seq1.onTrigger"/>-->
+		
+	</Events>
+
+	<!-- Data stream assignments -->
+	<DataStreams>
+		<Seq1>
+			<out_img type="out" group="Con1"/>
+		</Seq1>
+		<Fex1>
+			<in_img type="in" group="Con1"/>
+			<out_descriptors type="out" group="Con2"/>
+			<out_keypoints type="out" group="Con3"/>
+		</Fex1>
+		<matcher>
+			<in_descriptors type="in" group="Con2"/>
+			<in_to_match type="in" group="Con1"/>
+			<in_keypoints type="in" group="Con3"/>
+			<matched_img type="out" group="Con4"/>
+		</matcher>
+		<Wnd1>
+			<in_img  type="in" group="Con4"/>
+		</Wnd1>
+		
+	</DataStreams>
+
+</Task>
+
+
+
+
+
+
+
+

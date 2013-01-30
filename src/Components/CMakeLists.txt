@@ -1,0 +1,10 @@
+# Add all components here using ADD_COMPONENT(<COMPONENT_DIRECTORY>)
+ADD_COMPONENT(Sequencer)
+
+ADD_COMPONENT(ExtractSURF)
+
+ADD_COMPONENT(ExtractSIFT)
+
+ADD_COMPONENT(MatcherFLANN)
+
+ADD_COMPONENT(DisplayCorrespondence)

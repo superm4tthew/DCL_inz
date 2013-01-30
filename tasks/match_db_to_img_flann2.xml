@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Task>
+	<!-- List of components -->
+	<Components>
+	<Kbd1 type="Keyboard" thread="Exec2" group="s1">
+            <keys>t</keys> 
+        </Kbd1>
+	
+	 	<matcher type="MatcherFLANN" thread="Exec3" group="s1">
+	 		<directory>/home/mati/pliki/imagedb/surf10/</directory>
+	 		<patchsize>64</patchsize>
+	 		<!--<mode>0</mode>-->
+	 		<queuesize>100</queuesize>
+	 		<!--<maxload>10</maxload>-->
+	 		<threshold>0.2</threshold>
+	 		<matching_mode>1</matching_mode>
+			<matching_param>10</matching_param>
+			<min_tile_matches>1</min_tile_matches>
+        </matcher>
+        
+        <Seq1 type="Sequencer" thread="Exec3" group="s1">
+			<!--<directory>/home/mati/DisCODe/datasets/opencv_classics_modified/</directory>
+			<directory>/home/mati/imagedb/images/brightnesshigh2/</directory>-->
+			<directory>/home/mati/pliki/imagedb/newdb/rot30/</directory>
+			<!--<directory>/home/mati/pliki/imagedb/newdb/source/</directory>-->
+			<triggered>1</triggered>		
+			<!--<files_to_load>100</files_to_load>-->
+		</Seq1>
+		
+		<Fex1 type="ExtractSURF" thread="Exec3" group="s1">
+			<mode>1</mode>
+			<threshold>300</threshold>
+		</Fex1>
+		
+		<Cor1 type="DisplayCorrespondence" thread="Exec3" group="s1">
+			<mode>1</mode>
+			<scalefactor>1</scalefactor>
+			<angle>0</angle>
+		</Cor1>
+		
+		<Wnd1 type="CvWindow" thread="Exec5" group="s1">
+			<title>Preview</title>
+		</Wnd1>
+
+	</Components>
+
+	<!-- Threads of execution -->
+	<Executors>
+		
+		<Exec2 type="continuous">
+			<main_component>Kbd1</main_component>
+		</Exec2>
+		
+		<Exec3 type="continuous">
+			<main_component>Seq1</main_component>
+		</Exec3>
+		
+		
+		<Exec5 type="continuous">
+			<main_component>Wnd1</main_component>
+			<!-- <interval>0.2</interval>-->
+		</Exec5>
+		
+		
+	</Executors>
+
+	<!-- Event connections -->
+	<Events>
+		<Event source="Kbd1.t_Pressed" destination="Seq1.onTrigger"/>
+		<Event source="Seq1.newImage" destination="Fex1.onNewImage"/>
+		<Event source="Fex1.Computed" destination="matcher.onNewImage"/>
+		<Event source="matcher.matched" destination="Cor1.onNewImage"/>
+		<Event source="Cor1.matched" destination="Wnd1.onNewImage"/>
+		<!--
+		<Event source="Cor1.matched" destination="Seq1.onTrigger"/>
+		<Event source="Seq1.newImage" destination="Wnd1.onNewImage"/>
+		 wywalic 
+		<Event source="matcher.matched" destination="Seq1.onTrigger"/>-->
+		
+	</Events>
+
+	<!-- Data stream assignments -->
+	<DataStreams>
+		<Seq1>
+			<out_img type="out" group="Con1"/>
+		</Seq1>
+		<Fex1>
+			<in_img type="in" group="Con1"/>
+			<out_descriptors type="out" group="Con2"/>
+			<out_keypoints type="out" group="Con3"/>
+		</Fex1>
+		<matcher>
+			<in_descriptors type="in" group="Con2"/>
+			<in_to_match type="in" group="Con1"/>
+			<in_keypoints type="in" group="Con3"/>
+			<!--<matched_img type="out" group="Con4"/>-->
+			
+			<out_image_params type="out" group="Con5"/>
+			<out_path type="out" group="Con6"/>
+			<out_MatchedSourceForTile type="out" group="Con7"/>
+			<out_PositionOfPatchesInImages type="out" group="Con8"/>
+			<out_MatchedPatchInMatcher type="out" group="Con9"/>
+			<out_DistanceMap type="out" group="Con10"/>
+			<out_all_file_paths type="out" group="Con11"/>
+			<out_match_map type="out" group="Con12"/>
+			<out_match_quality type="out" group="Con13"/>
+			<!--matched_img type="out" group="Con11"/>-->
+			
+		</matcher>
+		
+		<Cor1>
+			<in_img  type="in" group="Con1"/>
+			<out_image  type="out" group="Con4"/>
+			
+			<in_image_params type="in" group="Con5"/>
+			<in_path type="in" group="Con6"/>
+			<in_MatchedSourceForTile type="in" group="Con7"/>
+			<in_PositionOfPatchesInImages type="in" group="Con8"/>
+			<in_MatchedPatchInMatcher type="in" group="Con9"/>
+			<in_DistanceMap type="in" group="Con10"/>
+			<in_all_file_paths type="in" group="Con11"/>
+			<in_match_map type="in" group="Con12"/>
+			<in_match_quality type="in" group="Con13"/>
+			
+		</Cor1>
+		
+		<Wnd1>
+			<in_img  type="in" group="Con4"/>
+		</Wnd1>
+		
+	</DataStreams>
+
+</Task>
+
+
+
+

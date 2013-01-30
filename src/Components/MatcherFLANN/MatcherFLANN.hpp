@@ -1,0 +1,114 @@
+#ifndef MatcherFLANN_HPP_
+#define MatcherFLANN_HPP_
+
+#include "Component_Aux.hpp"
+#include "Component.hpp"
+#include "Panel_Empty.hpp"
+#include "DataStream.hpp"
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include <cv.h>
+
+#include "Property.hpp"
+
+
+namespace Processors {
+namespace MatcherFLANN {
+
+using namespace cv;
+
+class MatcherFLANN: public Base::Component {
+public:
+	//Constructor.
+	MatcherFLANN(const std::string & name = "");
+	//Destructor
+	virtual ~MatcherFLANN();
+protected:
+	//Connects source to given device.
+	bool onInit();
+	//Disconnect source from device, closes streams, etc.
+	bool onFinish();
+	//Retrieves data from device.
+	bool onStep();
+	//Start component
+	bool onStart();
+	//Stop component
+	bool onStop();
+
+	void onNewImage();
+	void readDB();
+	bool findFiles();
+
+
+	//void QueryMatchMap(int **matchresults2, int **matchresults3, int max_p, int num_patches_vy, int num_patches_hx);
+
+	Base::DataStreamIn<Mat> in_to_match;
+	Base::DataStreamIn<Mat> in_descriptors;
+	Base::DataStreamIn<std::vector<cv::KeyPoint> > in_keypoints;
+	Base::DataStreamOut<std::string> out_path;
+	Base::DataStreamOut<std::vector<std::string> > out_all_file_paths;
+	Base::DataStreamOut<Mat> matched_img;
+
+	Base::EventHandler<MatcherFLANN> h_onNewImage;
+	Base::Event * matched;
+	
+	Base::DataStreamOut<std::vector<int> > out_image_params;
+	
+	
+	Base::DataStreamOut<std::vector<std::vector<int> > > out_MatchedSourceForTile;
+	Base::DataStreamOut<std::vector<int> > out_PositionOfPatchesInImages;
+	Base::DataStreamOut<std::vector<std::vector<int> > > out_MatchedPatchInMatcher;
+	Base::DataStreamOut<std::vector<std::vector<double> > > out_DistanceMap;
+	
+	Base::DataStreamOut<std::vector<double> > out_match_map;
+	Base::DataStreamOut<double > out_match_quality;
+	
+
+private:
+	std::vector<std::string> files;
+	std::vector<std::vector<cv::KeyPoint> > all_keypoints;
+	std::vector<Mat> all_descriptors;
+//	std::vector<int> all_num;
+	std::vector<std::string> all_file_paths;
+	std::vector<int> GlobalMappingPatchToImage;
+	std::vector<int> PositionOfPatchesInImages;
+	
+	std::vector<int> BDImageSizeCols;
+	std::vector<int> BDImageSizeRows;
+	std::vector<int> BDImagePatchSize;
+	
+
+	FlannBasedMatcher flannmatcher;
+	
+	Base::Property<std::string> directory;
+	Base::Property<std::string> pattern;
+//	Base::Property<int> PARAM;
+	Base::Property<int> mode;
+	Base::Property<std::string> savematcher;
+	Base::Property<int> patchsize;
+	Base::Property<float> threshold;
+	Base::Property<int> queuesize;
+	Base::Property<int> matching_mode;
+	Base::Property<int> matching_param;
+	Base::Property<int> advanced_options;
+	Base::Property<int> min_tile_matches;
+	
+	int num_loops;
+	int ctr;
+	int files_number;
+	int queue_size;
+
+
+
+
+};
+
+}//: namespace MatcherFLANN
+}//: namespace Processors
+
+//Register processor component.
+REGISTER_PROCESSOR_COMPONENT("MatcherFLANN", Processors::MatcherFLANN::MatcherFLANN, Common::Panel_Empty)
+
+#endif /* MatcherFLANN_HPP_ */
